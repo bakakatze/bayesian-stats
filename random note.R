@@ -124,3 +124,78 @@ sum(post2[theta >= 0.47 & theta <= 0.53]) # still very likely
 
 
 
+
+#### Example: Election Poll with Metropolis algorithm ####
+
+# Steps to take
+steps = 10e3
+
+# Thinning
+thin = 1 # take every N step, 1 = every step, 10 = every 10 steps
+
+# Load functions that are model-specific
+source("model_1param.R")
+
+# Starting position in parameter space
+params = 0.5 # c(0,0) # for multi-parameters
+
+# Measure how good it is
+logh = log_prior(params) + log_likelihood(params)
+
+# set up 2D array for storage of results
+keep = array(NA, dim = c(steps/thin, length(params)))
+
+# Set up 1D array
+logl_keep = array(NA, dim = steps/thin)
+
+# Count number of accepted proposals
+accepted = 0
+
+# Do Metropolis
+for(i in 1:steps)
+{
+  # Propose to move somewhere else
+  params2 = proposal(params)
+  
+  # Measure how good it is
+  logh2 = log_prior(params2) + log_likelihood(params2)
+  
+  # Acceptance probability
+  log_alpha = logh2 - logh
+  if(log_alpha > 0)
+  {
+    log_alpha = 0
+  }
+  
+  # Accept the proposal with probability alpha
+  if(runif(1) < exp(log_alpha))
+  {
+    params = params2
+    logh = logh2
+    accepted = accepted+1
+  }
+  
+  # Store results
+  if(i %% thin == 0)
+  {
+    keep[i/thin, ] = params
+    logl_keep[i/thin] = log_likelihood(params)
+    cat("Done", i, "iterations.\n")
+  }
+  
+}
+
+# plot them
+plot(keep, type = "l", main = "Trace Plot")
+
+# histogram
+hist(keep)
+
+
+## Problems with Metropolis algorithm:
+# If your step size is too small.. it won't converge, it jumps around slowly and will never create a reasonable posterior distribution
+# If your step size is too large.. it won't move anywhere because any new proposal is just too implausible
+
+
+#
+
