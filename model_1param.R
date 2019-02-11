@@ -14,8 +14,7 @@ log_prior = function(params)
 # Log likelihood
 log_likelihood = function(params)
 {
-    l = params^6*(1-params)^4
-    logl = log(l)
+    logl = 6*log(params) + 4*log(1-params)
     return(logl)
 }
 

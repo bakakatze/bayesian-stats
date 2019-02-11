@@ -126,6 +126,9 @@ sum(post2[theta >= 0.47 & theta <= 0.53]) # still very likely
 
 
 #### Example: Election Poll with Metropolis algorithm ####
+# Data: 6 Yeses and 4 Nays
+
+# Create a posterior distribution for this, assuming that the prior 
 
 # Steps to take
 steps = 10e3
@@ -136,7 +139,7 @@ thin = 1 # take every N step, 1 = every step, 10 = every 10 steps
 # Load functions that are model-specific
 source("model_1param.R")
 
-# Starting position in parameter space
+# Starting position in parameter space (0.5 = equal probability of yes/no in a poll)
 params = 0.5 # c(0,0) # for multi-parameters
 
 # Measure how good it is
@@ -198,4 +201,5 @@ hist(keep)
 
 
 #
+
 
