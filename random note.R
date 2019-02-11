@@ -199,7 +199,24 @@ hist(keep)
 # If your step size is too small.. it won't converge, it jumps around slowly and will never create a reasonable posterior distribution
 # If your step size is too large.. it won't move anywhere because any new proposal is just too implausible
 
+#### Example: Run a code 100x, 90 successes ####
 
-#
+## What was the success probability of theta?
+
+# This example will run use_jags.R
+source("use_jags.R")
+
+# the results will have N parameters, depens on how many you put in
+names(results)
+
+# trace plot
+plot(results$theta, type = "l", main = "Trace Plot")
+
+# posterior distribution
+hist(results$theta, breaks = 100)
+
+
+mean(results$theta)
+
 
 

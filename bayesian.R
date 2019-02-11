@@ -95,5 +95,6 @@ plot(theta, post, xlab = "theta", ylab = "posterior probability")
 
 #### 9. Just Another Gibbs Sampler (JAGS) ####
 
-
+# A programme that automates MCMC sampling
+# You specify: prior, likelihood, and data
 
