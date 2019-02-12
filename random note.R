@@ -199,7 +199,7 @@ hist(keep)
 # If your step size is too small.. it won't converge, it jumps around slowly and will never create a reasonable posterior distribution
 # If your step size is too large.. it won't move anywhere because any new proposal is just too implausible
 
-#### Example: Run a code 100x, 90 successes ####
+#### Example (JAGS): Run a code 100x, 90 successes ####
 
 ## What was the success probability of theta?
 
@@ -217,6 +217,60 @@ hist(results$theta, breaks = 100)
 
 
 mean(results$theta)
+#
+#### Data: British Coal Mining Accidents ####
+
+# Load the data:
+
+data = list(t = as.integer(c(1851, 1852, 1853, 1854, 1855, 
+                                     1856, 1857, 1858, 1859, 1860, 1861, 1862, 1863, 1864, 1865, 1866, 
+                                     1867, 1868, 1869, 1870, 1871, 1872, 1873, 1874, 1875, 1876, 1877, 
+                                     1878, 1879, 1880, 1881, 1882, 1883, 1884, 1885, 1886, 1887, 1888, 
+                                     1889, 1890, 1891, 1892, 1893, 1894, 1895, 1896, 1897, 1898, 1899, 
+                                     1900, 1901, 1902, 1903, 1904, 1905, 1906, 1907, 1908, 1909, 1910, 
+                                     1911, 1912, 1913, 1914, 1915, 1916, 1917, 1918, 1919, 1920, 1921, 
+                                     1922, 1923, 1924, 1925, 1926, 1927, 1928, 1929, 1930, 1931, 1932, 
+                                     1933, 1934, 1935, 1936, 1937, 1938, 1939, 1940, 1941, 1942, 1943, 
+                                     1944, 1945, 1946, 1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 
+                                     1955, 1956, 1957, 1958, 1959, 1960, 1961, 1962)), 
+                 y = c(4, 5, 4, 1, 0, 4, 3, 4, 0, 6, 3, 3, 4, 0, 2, 6, 3, 3, 5, 4, 5, 3, 
+                           1, 4, 4, 1, 5, 5, 3, 4, 2, 5, 2, 2, 3, 4, 2, 1, 3, 2, 2, 1, 1, 
+                           1, 1, 3, 0, 0, 1, 0, 1, 1, 0, 0, 3, 1, 0, 3, 2, 2, 0, 1, 1, 1, 
+                           0, 1, 0, 1, 0, 0, 0, 2, 1, 0, 0, 0, 1, 1, 0, 2, 3, 3, 1, 1, 2, 
+                           1, 1, 1, 1, 2, 4, 2, 0, 0, 0, 1, 4, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
+                           1, 0, 0, 1, 0, 1),
+            N = 112)
+
+
+# Run the source
+source("use_jags.R")
+
+
+# results
+plot(results$lambda, type = "l")
+
+# histogram
+hist(results$lambda, breaks = 100)
+
+#
+## Try different model, incorporating change point model
+
+source("use_jags2.R")
+
+# join distribution
+plot(results$lambda1, results$lambda2, cex = 0.5)
+
+# cause year is in integer
+hist(results$change_year, breaks = 500)
+
+# Posterior distribution
+hist(results$lambda, breaks = 500)
+
+# Plot the model through the data
+plot(data$t, data$y)
+lines(data$t, results$lambda[1, ])
+lines(data$t, results$lambda[50, ])
 
 
 
+#
