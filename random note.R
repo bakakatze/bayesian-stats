@@ -274,3 +274,35 @@ lines(data$t, results$lambda[50, ])
 
 
 #
+
+#### Data: Road Data - Linear Regression ####
+
+# Y = distance in meter that person can see a road sign
+# X = age, N = number of data points
+data = structure(list(N = 30, 
+            x = c(18, 20, 22, 23, 23, 25, 27, 
+                                     28, 29, 32, 37, 41, 46, 90, 53, 55, 63, 65, 66, 67,
+                                     68, 70, 71, 72, 73, 74, 75, 77, 79, 82),
+            y = c(510, 590, 560, 510, 460, 490, 560, 510, 460, 410, 420, 460, 
+                            450, 380, 460, 420, 350, 420, 300, 410, 300, 390, 320, 
+                            370, 280, 420, 460, 360, 310, 360)),
+            .Names = c("N", "x", "y"))
+
+
+## We need to choose prior for intercept and the slope and the error
+
+source("use_jags_lin_reg.R")
+
+# Trace plot
+names(results)
+
+plot(results$beta0, type = "l")
+
+# join posterior distribution
+plot(results$beta0, results$beta1, cex = 0.1)
+
+# prediction for the 90 years old
+hist(results$y_next, breaks = 100)
+
+
+#
