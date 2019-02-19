@@ -316,7 +316,7 @@ hist(results$y_next, breaks = 100)
 #
 
 
-#### DATA: ANDROMEDA-SHOCK TRIAL ####
+#### Data: ANDROMEDA-SHOCK TRIAL ####
 #
 # Comparing the use of Capillary Refill Time vs. Lactate Level as a guiding measures to treat hypovelemic shock
 
@@ -383,3 +383,69 @@ col=c(“black”,“green”,“red”),
 lty=c(3,2,1),
 lwd=2, #line width = 2
 legend=c(“Prior”, “Likelihood”, “Posterior”))
+
+#### Data: Widget Spinners (fake data) - T-Test ####
+
+# Manufacturer A: mean lifetime = 42 hours, SD = 7.48 hours, N = 9
+# Manufacturer B: mean lifetime = 50 hours, SD = 6.48 hours, N = 4
+# Is one manufacturer better than the other, in a way we can expect to generalise?
+
+
+data = structure(list(y1 = c(41.26297, 35.80629, 36.00830, 43.58714, 37.49637, 52.6908, 42.42694, 32.52, 56.19513),
+                      y2 = c(54.96650, 47.07097, 57.12499, 40.83754),
+                      N1 = 9,
+                      N2 = 4),
+                 .Names = c("y1", "y2", "N1", "N2"))
+
+## MODEL 1 (mu1 and mu2 could be anything and independent to each other)
+source("use_jags_t_test.R")
+
+# Is mu2 better?
+mean(results$mu2 > results$mu1)
+
+
+# plot two histogram (mu1 could be anything, mu2 might be similar to mu1)
+hist(results$mu1, col = "blue", breaks= 100)
+hist(results$mu2, col = rgb(1,0,0,0.5), breaks = 100, add=T)
+box()
+
+# is mu1 = mu2?
+mean(results$mu2 == results$mu1) # this is useless, this model cannot really answer this hypothesis
+
+
+## MODEL 2
+source("use_jags_t_test2.R")
+
+hist(results$difference, breaks = 100)
+hist(results$size_of_difference, breaks = 100)
+
+# plot two histogram
+hist(results$mu1, col = "red", breaks= 100)
+hist(results$mu2, col = "blue", breaks = 100, add=T)
+
+# plot dots
+plot(results$mu1, results$mu2, cex = .1)
+
+# test the null hypothesis
+mean(results$mu2 == results$mu1)
+
+
+#
+## MODEL 3 (mu1 and mu2 might be close together, or they may be far apart)
+
+source("use_jags_t_test3.R")
+
+# dot plot
+plot(results$mu2, results$mu2, cex = 0.1)
+
+# plot two histogram
+hist(results$mu1, col = "red", breaks= 100)
+hist(results$mu2, col = "blue", breaks = 100, add=T)
+
+# is mu2 > mu1?
+mean(results$mu2 > results$mu1)
+# much less than model 1, depends on the prior AND the data
+# prior won't matter much (usually) if you have good data
+
+
+
