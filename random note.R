@@ -304,5 +304,16 @@ plot(results$beta0, results$beta1, cex = 0.1)
 # prediction for the 90 years old
 hist(results$y_next, breaks = 100)
 
+##
+# IT is much better to use t-distribution and let the parameter nu varies
+# mu approaches infinity will be equal to normal distribution
+# JAGS code:
+#
+# log_nu ~ dunif(0, log(100))
+# nu <- exp(log_nu)
+#
+# y[i] ~ dt(mu[i], 1/sigma^2, nu)
+#
+
 
 #
