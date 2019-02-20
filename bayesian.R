@@ -98,3 +98,31 @@ plot(theta, post, xlab = "theta", ylab = "posterior probability")
 # A programme that automates MCMC sampling
 # You specify: prior, likelihood, and data
 
+#
+#### 10. Posterior Predictive Checks ####
+
+# modify the likelihood:
+
+# it looks like this
+model = "model
+{
+  
+  ## Likelihood
+  for(i in 1:N)
+  {
+  mu[i] <- beta0 + beta1*x[i]
+  y[i] ~ dnorm(mu[i], 1/sigma^2)
+
+  y_new[i] ~ dnorm(mu[i], 1/sigma^2)
+  }
+  
+}
+"
+# Then look at the y_new distribution
+# there is a formal hypothesis test for this
+
+
+
+
+
+

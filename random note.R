@@ -1,3 +1,70 @@
+#### Data: ANDROMEDA-SHOCK TRIAL ####
+#
+# Comparing the use of Capillary Refill Time vs. Lactate Level as a guiding measures to treat hypovelemic shock
+
+# Credit: DanLane911
+# Calculating MCID
+
+#Here I am using the estimated reductions from the power calculation to get an OR for the MCID (may need to be converted to RR instead of OR)#
+
+a <- 0.3 * 420 #Intervention and Outcome
+b <- 0.45 * 420 #Control and Outcome
+c <- 420 - a #Intervention No Outcome
+d <- 420 - b #Control No Outcome
+
+MCID <- ((a+0.5) * (d+0.5))/((b+0.5) * (c+0.5))
+
+#Hazard Ratio
+
+HR <- 0.75
+UC <- 1.02
+
+#Calculate Prior
+#Skeptical prior mean estimate
+prior.theta <- log(1)
+prior.sd <- (log(1.0)-log(MCID-0.05))/1.96 #Calculating skeptical prior SD estimate for 5% probability of exceeding projected estimate
+#Enthusiastic Prior
+prior.theta <- log(MCID)
+prior.sd <- (log(1.05)-log(MCID))/1.96
+
+#Calculate Likelihood
+L.theta <- log(HR)
+L.sd <- (log(UCI)-log(HR))/1.96
+
+#Calculate Posterior
+post.theta <- ((prior.theta/prior.sd^2)+(L.theta/L.sd^2))/((1/prior.sd^2)+(1/L.sd^2))
+post.sd <- sqrt(1/((1/prior.sd^2)+(1/L.sd^2)))
+
+#Calculate posterior median effect and 95% certainty interval
+cbind(exp(qnorm(0.025, post.theta,post.sd, lower.tail = T)), exp(qnorm(0.5, post.theta,post.sd)), exp(qnorm(0.975, post.theta,post.sd)))
+
+#Calculate probability benefit (HR < 1.0)
+pnorm(log(1), post.theta,post.sd, lower.tail=T)
+
+# Plot the prior density
+mu.plot <- seq(-2,2,by=0.025)
+prior <- dnorm(mu.plot, prior.theta, prior.sd)
+likelihood <- dnorm(mu.plot, L.theta, L.sd)
+posterior <- dnorm(mu.plot, post.theta, post.sd)
+
+plot(exp(mu.plot), exp(prior),
+     type=“l”, col=“black”, lty=3,
+     xlim=c(0,1.5),
+     ylim=c(1,15),
+     lwd=2,
+     xlab=“Hazard Ratio”,
+     ylab=“Probability Density”)
+#likelihood
+lines(exp(mu.plot), exp(likelihood), col=“green”,lwd=2,lty = 2)
+#posterior
+lines(exp(mu.plot), exp(posterior), col=“red”,lwd=2)
+abline(v=1, col = “gray”)
+
+legend(“topleft”,
+        col=c(“black”,“green”,“red”),
+        lty=c(3,2,1),
+        lwd=2, #line width = 2
+        legend=c(“Prior”, “Likelihood”, “Posterior”))
 
 #### Conjugate Priors for Analytical Approach ####
 
@@ -316,73 +383,6 @@ hist(results$y_next, breaks = 100)
 #
 
 
-#### Data: ANDROMEDA-SHOCK TRIAL ####
-#
-# Comparing the use of Capillary Refill Time vs. Lactate Level as a guiding measures to treat hypovelemic shock
-
-# Credit: DanLane911
-# Calculating MCID
-
-#Here I am using the estimated reductions from the power calculation to get an OR for the MCID (may need to be converted to RR instead of OR)#
-
-a <- 0.3 * 420 #Intervention and Outcome
-b <- 0.45 * 420 #Control and Outcome
-c <- 420 - a #Intervention No Outcome
-d <- 420 - b #Control No Outcome
-
-MCID <- ((a+0.5) * (d+0.5))/((b+0.5) * (c+0.5))
-
-#Hazard Ratio
-
-HR <- 0.75
-UC <- 1.02
-
-#Calculate Prior
-#Skeptical prior mean estimate
-prior.theta <- log(1)
-prior.sd <- (log(1.0)-log(MCID-0.05))/1.96 #Calculating skeptical prior SD estimate for 5% probability of exceeding projected estimate
-#Enthusiastic Prior
-prior.theta <- log(MCID)
-prior.sd <- (log(1.05)-log(MCID))/1.96
-
-#Calculate Likelihood
-L.theta <- log(HR)
-L.sd <- (log(UCI)-log(HR))/1.96
-
-#Calculate Posterior
-post.theta <- ((prior.theta/prior.sd^2)+(L.theta/L.sd^2))/((1/prior.sd^2)+(1/L.sd^2))
-post.sd <- sqrt(1/((1/prior.sd^2)+(1/L.sd^2)))
-
-#Calculate posterior median effect and 95% certainty interval
-cbind(exp(qnorm(0.025, post.theta,post.sd, lower.tail = T)), exp(qnorm(0.5, post.theta,post.sd)), exp(qnorm(0.975, post.theta,post.sd)))
-
-#Calculate probability benefit (HR < 1.0)
-pnorm(log(1), post.theta,post.sd, lower.tail=T)
-
-# Plot the prior density
-mu.plot <- seq(-2,2,by=0.025)
-prior <- dnorm(mu.plot, prior.theta, prior.sd)
-likelihood <- dnorm(mu.plot, L.theta, L.sd)
-posterior <- dnorm(mu.plot, post.theta, post.sd)
-
-plot(exp(mu.plot), exp(prior),
-type=“l”, col=“black”, lty=3,
-xlim=c(0,1.5),
-ylim=c(1,15),
-lwd=2,
-xlab=“Hazard Ratio”,
-ylab=“Probability Density”)
-#likelihood
-lines(exp(mu.plot), exp(likelihood), col=“green”,lwd=2,lty = 2)
-#posterior
-lines(exp(mu.plot), exp(posterior), col=“red”,lwd=2)
-abline(v=1, col = “gray”)
-
-legend(“topleft”,
-col=c(“black”,“green”,“red”),
-lty=c(3,2,1),
-lwd=2, #line width = 2
-legend=c(“Prior”, “Likelihood”, “Posterior”))
 
 #### Data: Widget Spinners (fake data) - T-Test ####
 
@@ -447,5 +447,28 @@ mean(results$mu2 > results$mu1)
 # much less than model 1, depends on the prior AND the data
 # prior won't matter much (usually) if you have good data
 
+
+
+
+#### Data: Starling weights - 4 groups - ANOVA ####
+
+data = list(x = c(78,88,87,88,83,82,81,80,80,89,78,78,83,81,78,81,81,82,76,76,79,73,79,75,77,78,80,78,83,84,77,69,75,70,74,83,80,75,76,75),
+            group = c(rep(1,10), rep(2,10), rep(3,10), rep(4,10)),
+            N = 40)
+
+# run the codes
+source("use_jags_anova.R")
+
+# plot each one
+plot(results$mu[,1], type = "l")
+plot(results$mu[,2], type = "l")
+plot(results$mu[,3], type = "l")
+plot(results$mu[,4], type = "l")
+# there are some holes in the trace plots... JAGS algorithm is less efficient if the priors are correlated
+# May need pre-whitening (to make the priors independent)
+
+
+# mu2 > mu3
+mean(results$mu[,2] > results$mu[,3])
 
 
