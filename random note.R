@@ -69,12 +69,15 @@ legend(“topleft”,
 #### Conjugate Priors for Analytical Approach ####
 
 # Prior -------- Likelihod/Sampling Dist ----- Posterior
+
 # Uniform ------ Binomial -------------------- Beta
 # Beta --------- Binomial -------------------- Beta
 
 # Log-Uniform -- Poisson --------------------- Gamma
 # Gamma -------- Poisson --------------------- Gamma
 # Gamma -------- Exponential ----------------- Gamma
+
+# Dirichlet ---- Multinomial ----------------- Multinomial
 
 # Normal ------- Normal ---------------------- Normal
 
@@ -470,5 +473,112 @@ plot(results$mu[,4], type = "l")
 
 # mu2 > mu3
 mean(results$mu[,2] > results$mu[,3])
+
+
+
+#### Data: Auto-Regressive (1) time series (fake data) ####
+
+# length of simulation
+N = 1000
+
+# storage
+y = rep(1, N)
+
+# mean value
+mu = 0.85
+
+# how much of old value to remember
+alpha = 0.99
+
+# how much to 'kick' each time (uncertainty)
+beta = 0.1
+
+# simulate the AR(1) model
+for(i in 2:N)
+{
+  y[i] = mu + alpha*(y[i-1] - mu) + beta*rnorm(1) - (i * 1e-5)
+}
+
+# plot it
+plot(y, type = "l")
+
+# shape the data
+data = list(y = y, N = 1000)
+
+
+## Run the jags code
+source("use_jags_AR1.R")
+
+
+hist(results$beta, breaks = 100)
+hist(results$log_L, breaks = 100)
+hist(results$mu, breaks = 100)
+
+plot(results$log_L, results$mu, cex = .1)
+
+# So the posterior distribution for future n=1 and n=300 days
+# The standard deviation is much greater at day 300
+hist(results$y_future[,1], breaks = 100)
+hist(results$y_future[,300], breaks = 100)
+
+#
+#### Data: Wheel of Fortune (Classic: Chi Squared Test) ####
+
+# Wheel of Fortune: 3 players in 3 diff position
+# N = 30, pos 1 wins 8x, pos 2 wins 9x, pos 3 wins 13x
+
+# This is (the likelihood) basically a multinomial distribution
+
+# The prior will be a Dirichlet distribution
+# High alpha value means that there is no favor on one theta over the other. This will means a uniform density for multinomial.
+# Low alpha value means that high probability density in the corner. Favor one theta over the other.
+
+data = list(x = c(8, 9, 13), N = 30)
+
+source("use_jags_multinom.R")
+
+# We have 3 thetas
+plot(results$theta[,1], type = "l")
+
+
+hist(results$theta[,1], breaks = 100)
+hist(results$theta[,2], breaks = 100)
+hist(results$theta[,3], breaks = 100)
+
+# the mean probability
+mean(results$theta[,1])
+mean(results$theta[,2])
+mean(results$theta[,3])
+
+# is position 3 > position 1?
+mean(results$theta[,3] > results$theta[,1])
+
+## BUT, this is under the assumption of uniform prior which does not really describe reality.
+# cause we know that the probability cannot favor one position than the other by much.
+
+# Let's make a hierarchical model
+# favoring high value of alpha (which means the probability will be pulled towards the center, favoring equal likelihood of the 3 poisitons)
+source("use_jags_multinom_centered_prior.R")
+
+
+# the mean probability
+mean(results$theta[,1])
+mean(results$theta[,2])
+mean(results$theta[,3])
+
+# is position 3 > position 1?
+mean(results$theta[,3] > results$theta[,1])
+
+# correlated posterior/prior
+plot(results$theta[,1], results$theta[,3], cex = 0.1)
+
+# what is the likely alpha value
+hist(results$a, breaks = 100)
+
+
+
+
+
+
 
 
